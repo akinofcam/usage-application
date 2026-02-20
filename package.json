@@ -1,6 +1,6 @@
 {
   "name": "usage",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "macOS app usage tracker with folder protection",
   "main": "src/main.js",
   "type": "module",
