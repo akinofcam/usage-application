@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-import { spawn } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import yargs from 'yargs';
-import chalk from 'chalk';
-import fs from 'fs';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,8 +31,8 @@ async function countdown() {
 function launchElectronApp() {
   try {
     // Launch the electron app (works on macOS, Linux, Windows)
-    const electronPath = require.resolve('electron/cli');
-    const child = spawn(process.execPath, [electronPath, electronApp], {
+    // Use npx electron to launch the app directly
+    const child = spawn('npx', ['electron', electronApp], {
       detached: true,
       stdio: 'ignore'
     });
