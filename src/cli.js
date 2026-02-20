@@ -33,14 +33,7 @@ async function countdown() {
 
 function launchElectronApp() {
   try {
-    // Check if running on macOS
-    const platform = process.platform;
-    if (platform !== 'darwin') {
-      console.error(chalk.red('❌ This app is currently designed for macOS only'));
-      process.exit(1);
-    }
-
-    // Launch the electron app
+    // Launch the electron app (works on macOS, Linux, Windows)
     const electronPath = require.resolve('electron/cli');
     const child = spawn(process.execPath, [electronPath, electronApp], {
       detached: true,
