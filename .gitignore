@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+*.dmg
+.DS_Store
+.env
+.env.local
+*.log
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.nyc_output/
+coverage/
+package-lock.json
+.yarn.lock

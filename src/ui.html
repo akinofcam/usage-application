@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage - App Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(to bottom, #f5f7fa 0%, #c3cfe2 100%);
+            transition: background 0.3s;
+        }
+
+        body.dark-mode .container {
+            background: linear-gradient(to bottom, #1f1f2e 0%, #16213e 100%);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+        }
+
+        .header-title {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .apps-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .apps-section h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .app-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .app-item:last-child {
+            border-bottom: none;
+        }
+
+        .app-item:hover {
+            background: #f9f9f9;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+            border-radius: 6px;
+        }
+
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .app-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .time-bar {
+            width: 100px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+
+        .time-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+        }
+
+        .footer {
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Modal styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal {
+            background: white;
+            width: 420px;
+            max-width: calc(100% - 32px);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal h3 { margin-bottom: 8px; }
+        .modal p { color: #666; font-size: 14px; margin-bottom: 16px; }
+        .modal .actions { display:flex; gap:10px; justify-content:center }
+        .btn { padding: 10px 14px; border-radius: 8px; cursor: pointer; border: none; }
+        .btn.primary { background: linear-gradient(90deg,#667eea,#764ba2); color: #fff; }
+        .btn.ghost { background: #f2f4f8; color: #333; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            background: none;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .settings-panel {
+            background: #2d2d3d;
+            color: #e0e0e0;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .settings-panel h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        body.dark-mode .settings-panel h3 {
+            color: #e0e0e0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        body.dark-mode .setting-item {
+            border-bottom-color: #444;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-weight: 500;
+            color: #666;
+            font-size: 14px;
+        }
+
+        body.dark-mode .setting-label {
+            color: #aaa;
+        }
+
+        .setting-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        .setting-input {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100px;
+        }
+
+        body.dark-mode .setting-input {
+            background: #3d3d4d;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        body.dark-mode .stat-card {
+            background: #2d2d3d;
+            color: #e0e0e0;
+        }
+
+        .apps-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .apps-section {
+            background: #2d2d3d;
+            color: #e0e0e0;
+        }
+
+        .app-item:hover {
+            background: #f9f9f9;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+            border-radius: 6px;
+        }
+
+        body.dark-mode .app-item:hover {
+            background: #3d3d4d;
+        }
+    </style>
+        <!-- face-api.js from CDN (optional) -->
+        <script src="https://unpkg.com/@vladmandic/face-api@1.0.2/dist/face-api.min.js"></script>
+        <script>
+            let faceApiLoaded = false;
+            async function loadFaceApiModels() {
+                if (faceApiLoaded) return true;
+                try {
+                    // Load tiny face detector model from CDN
+                    const base = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(base);
+                    await faceapi.nets.faceLandmark68Net.loadFromUri(base);
+                    await faceapi.nets.faceRecognitionNet.loadFromUri(base);
+                    faceApiLoaded = true;
+                    return true;
+                } catch (err) {
+                    console.warn('face-api models failed to load', err);
+                    faceApiLoaded = false;
+                    return false;
+                }
+            }
+
+            function cosineSimilarity(a, b) {
+                if (!a || !b || a.length !== b.length) return 0;
+                let dot = 0, na = 0, nb = 0;
+                for (let i = 0; i < a.length; i++) { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+                return dot / (Math.sqrt(na)*Math.sqrt(nb));
+            }
+        </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">
+                <div style="width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,#667eea,#764ba2); display:flex; align-items:center; justify-content:center; font-size:22px; color:white;">U</div>
+                <div style="text-align:left">
+                    <h1 style="font-size:22px; margin-bottom:2px">Usage</h1>
+                    <p style="font-size:12px; opacity:0.95; margin-top:0">App Tracker</p>
+                </div>
+            </div>
+            <div class="header-nav">
+                <button class="nav-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-tab="goals">🎯 Goals</button>
+                <button class="nav-btn" data-tab="focus">🔥 Focus</button>
+                <button class="nav-btn" data-tab="history">📈 History</button>
+                <button class="nav-btn" data-tab="settings">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Apps Used</div>
+                        <div class="stat-value" id="total-apps">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Time</div>
+                        <div class="stat-value" id="total-time">0h 0m</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Switches</div>
+                        <div class="stat-value" id="app-switches">0</div>
+                    </div>
+                </div>
+
+                <div class="apps-section">
+                    <h2>Most Used Apps</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+                        <div style="font-size:14px; color:#666">Most Used Apps</div>
+                        <div>
+                            <button class="btn ghost" id="btn-export">Export CSV</button>
+                        </div>
+                    </div>
+                    <div id="apps-list" class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading usage data...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="tab-history" class="tab-content" style="display:none;">
+                <div class="apps-section">
+                    <h2>Week Summary</h2>
+                    <div id="week-summary" style="padding: 10px 0; color:#666">
+                        <p>Loading week summary...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Tab -->
+            <div id="tab-goals" class="tab-content" style="display:none;">
+                <div class="apps-section">
+                    <h2>Daily Goals & Limits</h2>
+                    <div style="margin-bottom: 15px; padding: 15px; background:#f5f5f5; border-radius:8px;">
+                        <h3 style="margin-bottom: 10px;">Set Daily Limit</h3>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <input type="text" id="goal-app-name" placeholder="App name (e.g., Chrome)" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            <input type="number" id="goal-limit-mins" placeholder="Minutes" min="5" value="60" style="width:100px; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            <select id="goal-category" style="width:120px; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="work">Work</option>
+                                <option value="social">Social</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="productivity">Productivity</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <button class="btn primary" id="btn-add-goal">Add Goal</button>
+                        </div>
+                    </div>
+                    <div id="goals-list" style="padding:10px 0;">
+                        <p style="color:#999">Loading goals...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Focus Mode Tab -->
+            <div id="tab-focus" class="tab-content" style="display:none;">
+                <div class="apps-section">
+                    <h2>Focus Mode</h2>
+                    <div id="focus-status" style="padding:15px; margin-bottom:15px; background:#f9f9f9; border-radius:8px; border-left:4px solid #667eea;">
+                        <p style="color:#666;">No active focus session</p>
+                    </div>
+                    <div style="margin-bottom:15px; padding:15px; background:#fff; border:1px solid #ddd; border-radius:8px;">
+                        <h3 style="margin-bottom:10px;">Start Focus Session</h3>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <select id="focus-duration" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                                <option value="10">10 minutes</option>
+                                <option value="25">25 minutes (Pomodoro)</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">60 minutes</option>
+                                <option value="120">120 minutes</option>
+                            </select>
+                            <button class="btn primary" id="btn-start-focus">Start Focus</button>
+                        </div>
+                    </div>
+                    <div id="focus-blocklist" style="padding:15px; background:#fff; border:1px solid #ddd; border-radius:8px;">
+                        <h3 style="margin-bottom:10px;">Apps to Block</h3>
+                        <p style="font-size:12px; color:#999; margin-bottom:10px;">Select apps to block during focus mode:</p>
+                        <div id="blocklist-apps" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px;">
+                            <p style="color:#999;">Loading apps...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-content" style="display:none;">
+                <div class="settings-panel active">
+                    <h3>Application Settings</h3>
+                    
+                    <div class="setting-item">
+                        <span class="setting-label">Dark Mode</span>
+                        <div class="toggle-switch" id="toggle-dark-mode"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <span class="setting-label">Notifications</span>
+                        <div class="toggle-switch" id="toggle-notifications"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <span class="setting-label">Auto-lock Timeout (seconds)</span>
+                        <input type="number" class="setting-input" id="auto-lock-timeout" min="30" max="3600" value="300">
+                    </div>
+
+                    <div class="setting-item">
+                        <span class="setting-label">Face Verification Threshold</span>
+                        <input type="number" class="setting-input" id="face-threshold" min="0.3" max="1.0" step="0.05" value="0.55">
+                    </div>
+
+                    <div class="setting-item">
+                        <span class="setting-label">Enable Analytics</span>
+                        <div class="toggle-switch" id="toggle-analytics"></div>
+                    </div>
+
+                    <div style="padding-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn ghost" id="btn-reset-settings">Reset to Default</button>
+                        <button class="btn primary" id="btn-save-settings">Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>👆 Click an app to view details or manage protection settings</p>
+        </div>
+    </div>
+
+    <!-- Unlock modal -->
+    <div id="modal-backdrop" class="modal-backdrop">
+        <div class="modal">
+            <h3 id="modal-title">Unlock Protected Path</h3>
+            <p id="modal-message">Preparing...</p>
+            <div id="camera-area" style="display:none; margin-bottom:12px;">
+                <video id="video" width="360" height="270" autoplay muted playsinline style="border-radius:8px; background:#000; display:block; margin:0 auto 8px"></video>
+                <canvas id="capture-canvas" width="360" height="270" style="display:none"></canvas>
+            </div>
+            <div class="actions">
+                <button id="btn-enroll" class="btn primary">Enroll Face</button>
+                <button id="btn-verify" class="btn ghost">Verify Face</button>
+                <button class="btn" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadUsageData() {
+            try {
+                const data = await window.usageAPI.getUsageData();
+                
+                if (!data || data.apps.length === 0) {
+                    document.getElementById('apps-list').innerHTML = '<div class="empty-state"><p>No app usage data yet. Start using your apps!</p></div>';
+                    return;
+                }
+
+                // Update stats
+                document.getElementById('total-apps').textContent = data.apps.length;
+                document.getElementById('total-time').textContent = formatTime(data.totalTime);
+                document.getElementById('app-switches').textContent = data.switches || 0;
+
+                // Sort apps by usage time (descending)
+                const sortedApps = data.apps.sort((a, b) => b.duration - a.duration);
+
+                // Calculate max duration for bar scaling
+                const maxDuration = sortedApps[0]?.duration || 1;
+
+                // Render apps list
+                const appsList = document.getElementById('apps-list');
+                appsList.innerHTML = sortedApps.map(app => {
+                    const percentage = (app.duration / maxDuration) * 100;
+                    return `
+                        <div class="app-item">
+                            <div class="app-icon">${app.name.charAt(0).toUpperCase()}</div>
+                            <div class="app-info">
+                                <div class="app-name">${app.name}</div>
+                                <div class="app-time">${formatTime(app.duration)}</div>
+                            </div>
+                            <div class="time-bar">
+                                <div class="time-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading usage data:', error);
+                document.getElementById('apps-list').innerHTML = '<div class="empty-state"><p>Error loading usage data</p></div>';
+            }
+        }
+
+        function formatTime(milliseconds) {
+            const seconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+
+            if (hours > 0) {
+                return `${hours}h ${minutes % 60}m`;
+            } else if (minutes > 0) {
+                return `${minutes}m`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+
+        // Load data on page load
+        window.addEventListener('load', loadUsageData);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btn-export');
+            if (btn) btn.onclick = async () => {
+                btn.disabled = true;
+                btn.textContent = 'Exporting...';
+                const res = await window.usageAPI.exportCSV();
+                if (res && res.success) {
+                    alert('Export saved to ' + res.path);
+                } else {
+                    alert('Export failed');
+                }
+                btn.disabled = false;
+                btn.textContent = 'Export CSV';
+            };
+        });
+
+        // Refresh every 5 seconds
+        setInterval(loadUsageData, 5000);
+        
+        // Unlock modal and protection check
+        async function showUnlockModal(path) {
+            const backdrop = document.getElementById('modal-backdrop');
+            const messageEl = document.getElementById('modal-message');
+            const titleEl = document.getElementById('modal-title');
+            const cameraArea = document.getElementById('camera-area');
+            const btnEnroll = document.getElementById('btn-enroll');
+            const btnVerify = document.getElementById('btn-verify');
+            backdrop.style.display = 'flex';
+            messageEl.textContent = 'Checking protection...';
+            titleEl.textContent = `Unlock: ${path}`;
+
+            let localStream = null;
+            async function startCamera() {
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    document.getElementById('video').srcObject = localStream;
+                    cameraArea.style.display = 'block';
+                } catch (err) {
+                    console.error('Camera error', err);
+                    cameraArea.style.display = 'none';
+                }
+            }
+
+            function stopCamera() {
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                    localStream = null;
+                }
+                cameraArea.style.display = 'none';
+            }
+
+            try {
+                const res = await window.usageAPI.checkProtection(path);
+                if (!res) {
+                    messageEl.textContent = 'Path is not protected';
+                    setTimeout(() => backdrop.style.display = 'none', 1200);
+                    return;
+                }
+
+                messageEl.textContent = 'Protected — verifying...';
+                // Try biometric first (Touch ID / native)
+                const verify = await window.usageAPI.verifyAccess(path, 'facelock', '');
+                if (verify.authorized) {
+                    messageEl.textContent = 'Access granted';
+                    setTimeout(() => backdrop.style.display = 'none', 800);
+                    stopCamera();
+                    return;
+                }
+
+                // Fallback to password prompt
+                const pwd = prompt('Enter password to unlock:');
+                if (!pwd) {
+                    messageEl.textContent = 'Access cancelled';
+                    setTimeout(() => backdrop.style.display = 'none', 800);
+                    return;
+                }
+
+                const pwdVerify = await window.usageAPI.verifyAccess(path, 'password', pwd);
+                messageEl.textContent = pwdVerify.authorized ? 'Access granted' : 'Incorrect password';
+                setTimeout(() => backdrop.style.display = 'none', 800);
+                stopCamera();
+            } catch (err) {
+                messageEl.textContent = 'Verification failed';
+                setTimeout(() => backdrop.style.display = 'none', 1200);
+                stopCamera();
+            }
+
+            // Enroll and verify handlers (camera-based, simple image match)
+            btnEnroll.onclick = async () => {
+                messageEl.textContent = 'Preparing enrollment...';
+                await startCamera();
+                // Try face-api if available
+                const hasFaceApi = await loadFaceApiModels();
+                if (hasFaceApi) {
+                    messageEl.textContent = 'Detecting face (face-api)...';
+                    const video = document.getElementById('video');
+                    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+                    if (detection && detection.descriptor) {
+                        messageEl.textContent = 'Saving embedding...';
+                        const res = await window.usageAPI.enrollFace(path, { embedding: Array.from(detection.descriptor) });
+                        messageEl.textContent = (res && res.success) ? 'Enrollment saved' : 'Enrollment failed';
+                        stopCamera();
+                        setTimeout(() => closeModal(), 900);
+                        return;
+                    }
+                    messageEl.textContent = 'No face detected';
+                }
+
+                // Fallback to pixel capture
+                messageEl.textContent = 'Capturing image...';
+                await new Promise(r => setTimeout(r, 700));
+                const canvas = document.getElementById('capture-canvas');
+                const video = document.getElementById('video');
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                const data = canvas.toDataURL('image/png');
+                messageEl.textContent = 'Saving enrollment...';
+                const res = await window.usageAPI.enrollFace(path, data);
+                messageEl.textContent = (res && res.success) ? 'Enrollment saved' : 'Enrollment failed';
+                setTimeout(() => closeModal(), 900);
+                stopCamera();
+            };
+
+            btnVerify.onclick = async () => {
+                messageEl.textContent = 'Preparing verification...';
+                await startCamera();
+                const hasFaceApi = await loadFaceApiModels();
+                if (hasFaceApi) {
+                    messageEl.textContent = 'Detecting face (face-api)...';
+                    const video = document.getElementById('video');
+                    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+                    if (detection && detection.descriptor) {
+                        const enrolled = await window.usageAPI.getEnrolledFace(path);
+                        if (!enrolled || !enrolled.embedding) {
+                            messageEl.textContent = 'No enrolled embedding found';
+                            stopCamera();
+                            return;
+                        }
+                        const sim = cosineSimilarity(detection.descriptor, enrolled.embedding);
+                        // similarity threshold for face-api descriptors (~0.5-0.7)
+                        if (sim > 0.55) {
+                            messageEl.textContent = 'Face verified — access granted';
+                        } else {
+                            messageEl.textContent = 'Face not recognized';
+                        }
+                        setTimeout(() => closeModal(), 1200);
+                        stopCamera();
+                        return;
+                    }
+                    messageEl.textContent = 'No face detected';
+                }
+
+                // Fallback to pixel-diff if face-api not available
+                messageEl.textContent = 'Capturing image...';
+                await new Promise(r => setTimeout(r, 700));
+                const canvas = document.getElementById('capture-canvas');
+                const video = document.getElementById('video');
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const current = canvas.toDataURL('image/png');
+                const enrolled = await window.usageAPI.getEnrolledFace(path);
+                if (!enrolled || !enrolled.image) {
+                    messageEl.textContent = 'No enrolled image found';
+                    stopCamera();
+                    return;
+                }
+                const imgA = new Image();
+                const imgB = new Image();
+                imgA.src = current;
+                imgB.src = enrolled.image;
+                await Promise.all([new Promise(r => imgA.onload = r), new Promise(r => imgB.onload = r)]);
+                const c1 = document.createElement('canvas');
+                c1.width = canvas.width; c1.height = canvas.height;
+                const c2 = document.createElement('canvas');
+                c2.width = canvas.width; c2.height = canvas.height;
+                const ctx1 = c1.getContext('2d'); ctx1.drawImage(imgA,0,0);
+                const ctx2 = c2.getContext('2d'); ctx2.drawImage(imgB,0,0);
+                const d1 = ctx1.getImageData(0,0,c1.width,c1.height).data;
+                const d2 = ctx2.getImageData(0,0,c2.width,c2.height).data;
+                let diff = 0;
+                for (let i=0;i<d1.length;i+=4){
+                    diff += Math.abs(d1[i]-d2[i]);
+                    diff += Math.abs(d1[i+1]-d2[i+1]);
+                    diff += Math.abs(d1[i+2]-d2[i+2]);
+                }
+                const max = c1.width*c1.height*3*255;
+                const score = 1 - (diff / max);
+                if (score > 0.65) {
+                    messageEl.textContent = 'Face verified — access granted';
+                } else {
+                    messageEl.textContent = 'Face not recognized';
+                }
+                setTimeout(() => closeModal(), 1200);
+                stopCamera();
+            };
+
+            // start camera automatically so user sees prompt
+            startCamera();
+        }
+
+        function closeModal(){
+            document.getElementById('modal-backdrop').style.display = 'none';
+            try { const v=document.getElementById('video'); if (v && v.srcObject) { v.srcObject.getTracks().forEach(t=>t.stop()); v.srcObject=null; }}catch(e){}
+        }
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const tab = e.target.getAttribute('data-tab');
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                e.target.classList.add('active');
+                document.getElementById(`tab-${tab}`).style.display = 'block';
+                
+                if (tab === 'history') {
+                    loadWeekSummary();
+                } else if (tab === 'settings') {
+                    loadSettingsUI();
+                }
+            });
+        });
+
+        // Settings Management
+        async function loadSettings() {
+            try {
+                const settings = await window.usageAPI.getSettings();
+                document.getElementById('toggle-dark-mode').classList.toggle('active', settings.darkMode);
+                document.getElementById('toggle-notifications').classList.toggle('active', settings.enableNotifications);
+                document.getElementById('toggle-analytics').classList.toggle('active', settings.enableAnalytics);
+                document.getElementById('auto-lock-timeout').value = settings.autoLockTimeout;
+                document.getElementById('face-threshold').value = settings.faceVerificationThreshold;
+                
+                // Apply dark mode
+                if (settings.darkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            } catch (err) {
+                console.error('Error loading settings:', err);
+            }
+        }
+
+        function setupToggleSwitches() {
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                });
+            });
+        }
+
+        async function saveSettings() {
+            try {
+                const darkMode = document.getElementById('toggle-dark-mode').classList.contains('active');
+                const enableNotifications = document.getElementById('toggle-notifications').classList.contains('active');
+                const enableAnalytics = document.getElementById('toggle-analytics').classList.contains('active');
+                const autoLockTimeout = parseInt(document.getElementById('auto-lock-timeout').value);
+                const faceThreshold = parseFloat(document.getElementById('face-threshold').value);
+
+                await window.usageAPI.setSetting('darkMode', darkMode);
+                await window.usageAPI.setSetting('enableNotifications', enableNotifications);
+                await window.usageAPI.setSetting('enableAnalytics', enableAnalytics);
+                await window.usageAPI.setSetting('autoLockTimeout', autoLockTimeout);
+                await window.usageAPI.setSetting('faceVerificationThreshold', faceThreshold);
+
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+
+                alert('Settings saved successfully!');
+            } catch (err) {
+                console.error('Error saving settings:', err);
+                alert('Failed to save settings');
+            }
+        }
+
+        async function resetSettings() {
+            if (confirm('Reset all settings to defaults?')) {
+                await window.usageAPI.resetSettings();
+                await loadSettings();
+                alert('Settings reset to defaults');
+            }
+        }
+
+        async function loadWeekSummary() {
+            try {
+                const summary = await window.usageAPI.getWeekSummary();
+                const container = document.getElementById('week-summary');
+                
+                if (!summary || Object.keys(summary).length === 0) {
+                    container.innerHTML = '<p style="color:#999">No week summary data</p>';
+                    return;
+                }
+
+                let html = '<table style="width:100%; border-collapse:collapse;">';
+                html += '<tr style="border-bottom:2px solid #ddd;"><th style="text-align:left;padding:8px;">Date</th><th style="text-align:left;padding:8px;">App</th><th style="text-align:right;padding:8px;">Duration</th></tr>';
+                
+                for (const [date, apps] of Object.entries(summary)) {
+                    for (const app of apps) {
+                        html += `<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">${date}</td><td style="padding:8px;">${app.app_name}</td><td style="text-align:right;padding:8px;">${formatTime(app.total_duration)}</td></tr>`;
+                    }
+                }
+                html += '</table>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading week summary:', err);
+                document.getElementById('week-summary').innerHTML = '<p style="color:red">Error loading summary</p>';
+            }
+        }
+
+        async function loadSettingsUI() {
+            await loadSettings();
+            setupToggleSwitches();
+            document.getElementById('btn-save-settings').onclick = saveSettings;
+            document.getElementById('btn-reset-settings').onclick = resetSettings;
+        }
+
+        // Initialize settings on load
+        window.addEventListener('load', async () => {
+            await loadSettings();
+            setupToggleSwitches();
+            document.getElementById('btn-save-settings').onclick = saveSettings;
+            document.getElementById('btn-reset-settings').onclick = resetSettings;
+
+            // Setup Goals tab
+            document.getElementById('btn-add-goal').onclick = addGoal;
+            document.getElementById('btn-start-focus').onclick = startFocusSession;
+            await loadGoals();
+            await loadFocusApps();
+        });
+
+        // Goals management
+        async function loadGoals() {
+            try {
+                const goals = await window.usageAPI.getAllGoals();
+                const container = document.getElementById('goals-list');
+                if (!goals || goals.length === 0) {
+                    container.innerHTML = '<p style="color:#999;">No goals set yet. Add one to get started!</p>';
+                    return;
+                }
+                let html = '<div style="display:grid; gap:8px;">';
+                for (const goal of goals) {
+                    const usageData = await window.usageAPI.getUsageData();
+                    const app = usageData.apps.find(a => a.name === goal.app_name);
+                    const usedMs = app ? app.duration : 0;
+                    const progress = await window.usageAPI.getGoalProgress(goal.app_name, usedMs);
+                    const percentage = progress ? progress.percentage : 0;
+                    const color = percentage > 100 ? '#ff6b6b' : percentage > 80 ? '#ffa500' : '#4caf50';
+                    html += `
+                        <div style="padding:10px; border:1px solid #eee; border-radius:6px; background:#f9f9f9;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong>${goal.app_name}</strong>
+                                <span style="font-size:12px; color:#666;">${Math.floor(percentage)}% (${progress ? progress.usedMinutes : 0}/${goal.limit_minutes}m)</span>
+                            </div>
+                            <div style="width:100%; height:6px; background:#e0e0e0; border-radius:3px; overflow:hidden; margin-bottom:5px;">
+                                <div style="width:${Math.min(percentage, 100)}%; height:100%; background:${color};"></div>
+                            </div>
+                            <button class="btn ghost" style="font-size:11px; padding:4px 8px;" onclick="deleteGoal('${goal.app_name}')">Remove</button>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading goals:', err);
+            }
+        }
+
+        async function addGoal() {
+            const appName = document.getElementById('goal-app-name').value.trim();
+            const limitMins = parseInt(document.getElementById('goal-limit-mins').value);
+            const category = document.getElementById('goal-category').value;
+            if (!appName || !limitMins) {
+                alert('Please fill in all fields');
+                return;
+            }
+            try {
+                const result = await window.usageAPI.setGoal(appName, limitMins, category);
+                if (result.success) {
+                    document.getElementById('goal-app-name').value = '';
+                    await loadGoals();
+                    alert(`Goal set for ${appName}: ${limitMins} minutes/day`);
+                }
+            } catch (err) {
+                alert('Error setting goal: ' + err.message);
+            }
+        }
+
+        async function deleteGoal(appName) {
+            if (confirm(`Delete goal for ${appName}?`)) {
+                try {
+                    await window.usageAPI.deleteGoal(appName);
+                    await loadGoals();
+                } catch (err) {
+                    alert('Error deleting goal: ' + err.message);
+                }
+            }
+        }
+
+        // Focus mode
+        async function loadFocusApps() {
+            try {
+                const data = await window.usageAPI.getUsageData();
+                const container = document.getElementById('blocklist-apps');
+                if (!data.apps || data.apps.length === 0) {
+                    container.innerHTML = '<p style="color:#999;">No apps tracked yet</p>';
+                    return;
+                }
+                let html = '';
+                for (const app of data.apps) {
+                    html += `
+                        <label style="display:flex; align-items:center; gap:8px; padding:8px; background:#f5f5f5; border-radius:6px; cursor:pointer;">
+                            <input type="checkbox" class="focus-app-check" data-app="${app.name}">
+                            <span>${app.name}</span>
+                        </label>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error loading focus apps:', err);
+            }
+        }
+
+        async function startFocusSession() {
+            const duration = parseInt(document.getElementById('focus-duration').value);
+            const blocked = Array.from(document.querySelectorAll('.focus-app-check:checked')).map(el => el.dataset.app);
+            if (blocked.length === 0) {
+                alert('Select at least one app to block');
+                return;
+            }
+            try {
+                const result = await window.usageAPI.startFocusSession(duration, blocked);
+                if (result.success) {
+                    alert(`🎯 Focus mode started for ${duration} minutes!\nBlocked apps: ${blocked.join(', ')}`);
+                    updateFocusStatus();
+                }
+            } catch (err) {
+                alert('Error starting focus session: ' + err.message);
+            }
+        }
+
+        async function updateFocusStatus() {
+            try {
+                const status = await window.usageAPI.getFocusStatus();
+                const container = document.getElementById('focus-status');
+                if (status && status.isActive) {
+                    const remaining = status.remainingMinutes || 0;
+                    const percent = (status.percentComplete || 0).toFixed(0);
+                    container.innerHTML = `
+                        <div>
+                            <p><strong>🔥 Focus Mode Active!</strong></p>
+                            <p style="margin:5px 0;">Remaining: <strong>${remaining}m</strong> (${percent}% complete)</p>
+                            <div style="width:100%; height:8px; background:#e0e0e0; border-radius:4px; overflow:hidden; margin:10px 0;">
+                                <div style="width:${percent}%; height:100%; background:#4caf50; transition:width 0.3s;"></div>
+                            </div>
+                            <button class="btn" style="font-size:12px;" onclick="endFocusSession()">End Focus</button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '<p style="color:#666;">No active focus session</p>';
+                }
+            } catch (err) {
+                console.error('Error updating focus status:', err);
+            }
+        }
+
+        async function endFocusSession() {
+            if (confirm('End focus mode?')) {
+                try {
+                    await window.usageAPI.endFocusSession();
+                    updateFocusStatus();
+                } catch (err) {
+                    alert('Error ending focus session: ' + err.message);
+                }
+            }
+        }
+
+        // Update focus status every 30 seconds
+        setInterval(updateFocusStatus, 30000);
+</body>
+</html>
