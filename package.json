@@ -9,6 +9,7 @@
     "dev": "electron . --development",
     "build": "electron-builder",
     "package": "electron-builder --mac",
+    "generate-logo": "node scripts/generate-logo.js",
     "verify": "bash verify.sh",
     "lint": "eslint src/",
     "lint-fix": "eslint src/ --fix",
@@ -40,14 +41,15 @@
     "yargs": "^17.7.2"
   },
   "optionalDependencies": {
-    "mac-biometric-authenticate": "latest",
-    "dmg-license": "^1.0.11"
+    "dmg-license": "^1.0.11",
+    "mac-biometric-authenticate": "latest"
   },
   "devDependencies": {
     "electron": "latest",
     "electron-builder": "latest",
     "eslint": "^8.54.0",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.0",
+    "sharp": "^0.34.5"
   },
   "build": {
     "appId": "com.usage.app",
@@ -79,4 +81,3 @@
     ]
   }
 }
-
