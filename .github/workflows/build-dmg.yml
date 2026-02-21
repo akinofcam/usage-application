@@ -1,0 +1,61 @@
+name: Build macOS DMG for 10.13+
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'App version'
+        required: true
+        default: '1.8.5'
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Update version
+        run: npm version ${{ github.event.inputs.version }} --no-git-tag-v
+      
+      - name: Build macOS package (ZIP)
+        run: npm run package
+      
+      - name: Create DMG
+        run: |
+          # Create DMG from the app bundle
+          dmg_name="Usage-${{ github.event.inputs.version }}-mac.dmg"
+          hdiutil create -srcfolder dist/mac -volname "Usage" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDZO -o "dist/${dmg_name}"
+          echo "DMG created: dist/${dmg_name}"
+          ls -lh "dist/${dmg_name}"
+      
+      - name: Create macOS 11 compatible DMG
+        run: |
+          dmg_name="usage_application-${{ github.event.inputs.version }}_under12.dmg"
+          # This version is compatible with macOS 11.0 and older (sierra and below)
+          hdiutil create -srcfolder dist/mac -volname "Usage" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDZO -o "dist/${dmg_name}"
+          echo "macOS 11 DMG created: dist/${dmg_name}"
+          ls -lh "dist/${dmg_name}"
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-dmg
+          path: dist/*.dmg
+          retention-days: 30
+      
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ github.event.inputs.version }}
+          artifacts: dist/*.dmg,dist/*.zip
+          allowUpdates: true
+          makeLatest: true

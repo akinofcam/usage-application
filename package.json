@@ -9,6 +9,7 @@
     "dev": "electron . --development",
     "build": "electron-builder",
     "package": "electron-builder --mac",
+    "build-dmg": "node scripts/build-dmg.js",
     "generate-logo": "node scripts/generate-logo.js",
     "verify": "bash verify.sh",
     "lint": "eslint src/",
@@ -58,7 +59,8 @@
       "target": [
         "zip"
       ],
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "minimumSystemVersion": "11.0.0"
     },
     "linux": {
       "target": [

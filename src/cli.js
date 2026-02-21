@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
 import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { spawn } from 'child_process';
+import chalk from 'chalk';
+import fs from 'fs';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 const require = createRequire(import.meta.url);
 
@@ -69,7 +76,7 @@ function protectPath(filePath, method, credential) {
 }
 
 async function main() {
-  const argv = yargs(process.argv.slice(2))
+  const argv = yargs(hideBin(process.argv))
     .usage('Usage: $0 [OPTIONS]')
     .option('protect', {
       alias: 'p',
